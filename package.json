@@ -4,10 +4,10 @@
   "description": "NodeJS lab wokrs.",
   "main": "start.js",
   "scripts": {
-	"start": "node index.js",
-	"lint": "eslint .",
-	"deploy": "echo Current branch: $TRAVIS_BRANCH",
-	"build": "echo builded",
+    "start": "node index.js",
+    "lint": "eslint .",
+    "deploy": "echo Current branch: $TRAVIS_BRANCH",
+    "build": "",
     "test": "echo \"Error: no test specified\""
   },
   "repository": {
@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/TheSubliminal/node_labs#readme",
   "devDependencies": {
-    "eslint": "^5.14.1"
-  }
+    "eslint": "^5.14.1",
+    "now": "^14.0.0"
+  },
+  "dependencies": {}
 }
