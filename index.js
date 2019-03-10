@@ -38,7 +38,7 @@ const startServer = (content, err) => {
 
     });
 
-    server.listen(8000);
+    server.listen();
 
 };
 
