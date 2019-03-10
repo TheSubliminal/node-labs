@@ -8,12 +8,12 @@ const url = require('url');
 //let content = fs.readFileSync('index.html');
 
 
-require('http').createServer((request, response) => {
+require('http').createServer((request) => {
 
     // console.log(request.url);
     console.log('URLS: ', request.url, url.parse(request.url).protocol);
 
-    if (request.url) {
+    /*if (request.url) {
         require('http').get(request.url, (resp) => {
 
             resp.pipe(response);
@@ -21,6 +21,6 @@ require('http').createServer((request, response) => {
         }).on('error', err => {
             console.log('Error from get: ', err.message);
         });
-    }
+    }*/
 
-}).listen(8000);
+}).listen();
