@@ -1,4 +1,4 @@
 {
 	"name": "node_labs",
-	"builds": [{ "src": "node-labs/index.js", "use": "@now/node" }]
+	"builds": [{ "src": "index.js", "use": "@now/node" }]
 }
