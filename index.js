@@ -1,3 +1,39 @@
-'use strict'
+'use strict';
 
-console.log('My name is Misha');
+const http = require('http');
+
+
+const startServer = (content, err) => {
+    if (err) throw err;
+
+    const server = http.createServer((request, response) => {
+
+        console.log(request.url);
+
+        //if (request.url.split(':')[0] === 'http') {
+            http.get(request.url, (resp) => {
+
+                resp.pipe(response);
+    
+            }).on('error', err => {
+                console.log('Error: ', err.message);
+            });
+        //}
+
+        /*if (request.url.split(':')[0] === 'https') {
+            https.get('https://' + request.url.split('://')[1], resp => {
+                console.log('https://' + request.url.split('://')[1]);
+                resp.pipe(response);
+    
+            }).on('error', err => {
+                console.log('Error: ', err.message);
+            });
+        }*/
+
+    });
+
+    server.listen(8000);
+
+};
+
+startServer();
