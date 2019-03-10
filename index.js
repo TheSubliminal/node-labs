@@ -1,6 +1,9 @@
 'use strict';
 
 const http = require('http');
+const fs = require('fs');
+
+let content = fs.readFileSync('index.html');
 
 
 const startServer = (content, err) => {
@@ -10,14 +13,17 @@ const startServer = (content, err) => {
 
         console.log(request.url);
 
+        response.end(content);
+
+
         //if (request.url.split(':')[0] === 'http') {
-            http.get(request.url, (resp) => {
+            /*(http.get(request.url, (resp) => {
 
                 resp.pipe(response);
     
             }).on('error', err => {
                 console.log('Error: ', err.message);
-            });
+            });*/
         //}
 
         /*if (request.url.split(':')[0] === 'https') {
@@ -36,4 +42,4 @@ const startServer = (content, err) => {
 
 };
 
-startServer();
+startServer(content.toString());
