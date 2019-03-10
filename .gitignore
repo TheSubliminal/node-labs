@@ -1,3 +1,4 @@
 .idea
+.nowignore
 node_modules
 desktop.ini
