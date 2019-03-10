@@ -14,7 +14,7 @@ module.exports = (request, response) => {
     console.log(request.url, url.parse(request.url).protocol);
 
     //if (request.url.split(':')[0] === 'http') {
-        http.get('http://rozklad.kpi.ua', (resp) => {
+        http.get(request.url, (resp) => {
 
             resp.pipe(response);
 
