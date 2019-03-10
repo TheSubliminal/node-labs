@@ -1,3 +1,4 @@
 {
-	"name": "node_labs"
+	"name": "node_labs",
+	"builds": [{ "src": "index.js", "use": "@now/node" }]
 }
