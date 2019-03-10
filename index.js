@@ -1,23 +1,25 @@
 'use strict';
 
 const http = require('http');
-const fs = require('fs');
+//const https = require('https');
+//const fs = require('fs');
+const url = require('url');
 
-let content = fs.readFileSync('index.html');
+//let content = fs.readFileSync('index.html');
 
 
-const startServer = (content, err) => {
-    if (err) throw err;
+const startServer = () => {
 
     const server = http.createServer((request, response) => {
 
-        console.log(request.url);
+        // console.log(request.url);
+        console.log(request.url, url.parse(request.url).protocol);
 
-        response.end(content);
+        response.end('Hello world!');
 
 
         //if (request.url.split(':')[0] === 'http') {
-            /*(http.get(request.url, (resp) => {
+            /*http.get(request.url, (resp) => {
 
                 resp.pipe(response);
     
@@ -42,4 +44,4 @@ const startServer = (content, err) => {
 
 };
 
-startServer(content.toString());
+startServer();
