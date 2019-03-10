@@ -8,11 +8,12 @@ const url = require('url');
 //let content = fs.readFileSync('index.html');
 
 
-require('http').createServer((request) => {
+require('http').createServer((request, response) => {
 
     // console.log(request.url);
     console.log('URLS: ', request.url, url.parse(request.url).protocol);
 
+    response.end('RESPONSE FOR: ' + request.url);
     /*if (request.url) {
         require('http').get(request.url, (resp) => {
 
