@@ -1,6 +1,6 @@
 'use strict';
 
-//const http = require('http');
+const http = require('http');
 //const https = require('https');
 //const fs = require('fs');
 const url = require('url');
@@ -13,17 +13,14 @@ module.exports = (request, response) => {
     // console.log(request.url);
     console.log(request.url, url.parse(request.url).protocol);
 
-    response.end('Hello world!');
-
-
     //if (request.url.split(':')[0] === 'http') {
-        /*http.get(request.url, (resp) => {
+        http.get(request.url, (resp) => {
 
             resp.pipe(response);
 
         }).on('error', err => {
             console.log('Error: ', err.message);
-        });*/
+        });
     //}
 
     /*if (request.url.split(':')[0] === 'https') {
