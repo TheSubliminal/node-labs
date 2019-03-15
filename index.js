@@ -1,27 +1,35 @@
 'use strict';
 
-//const http = require('http');
-//const https = require('https');
-//const fs = require('fs');
-const url = require('url');
+const http = require('http');
+const https = require('https');
 
-//let content = fs.readFileSync('index.html');
+const server = http.createServer((request, response) => {
 
 
-require('http').createServer((request, response) => {
+    console.log('URLS: ', request.url);
 
-    // console.log(request.url);
-    console.log('URLS: ', request.url, url.parse(request.url).protocol);
+    response.setHeader('Testing', 'This is my Proxy! ');
 
-    response.end('RESPONSE FOR: ' + request.url);
-    /*if (request.url) {
-        require('http').get(request.url, (resp) => {
+    if (request.url.split('://')[0] === 'http') {
+        http.get(request.url, (resp) => {
 
             resp.pipe(response);
 
         }).on('error', err => {
             console.log('Error from get: ', err.message);
         });
-    }*/
+    }
+    else {
+        https.get(request.url, (resp) => {
 
-}).listen(8000);
+            resp.pipe(response);
+
+        }).on('error', err => {
+            console.log('Error from get: ', err.message);
+        });
+    }
+
+});
+
+server.listen(8000);
+
