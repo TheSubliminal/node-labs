@@ -1,35 +1,43 @@
 'use strict';
 
 const http = require('http');
-const https = require('https');
+const net = require('net');
+const url = require('url');
 
-const server = http.createServer((request, response) => {
+const proxy = http.createServer((request, response) => {
 
+    response.writeHead(200, { 'Content-Type': 'text/html' });
 
-    console.log('URLS: ', request.url);
-
-    response.setHeader('Testing', 'This is my Proxy! ');
-
-    if (request.url.split('://')[0] === 'http') {
+    if (url.parse(request.url).protocol === 'http:') {
+        console.log('HTTP GET:', request.url, new Date().toLocaleTimeString());
         http.get(request.url, (resp) => {
-
             resp.pipe(response);
-
         }).on('error', err => {
-            console.log('Error from get: ', err.message);
-        });
-    }
-    else {
-        https.get(request.url, (resp) => {
-
-            resp.pipe(response);
-
-        }).on('error', err => {
-            console.log('Error from get: ', err.message);
+            console.log('ERROR GET: ', err.message);
         });
     }
 
+}).on('error', (err) => console.log('ERROR SERVER:', err));
+
+proxy.on('connect', (req, cltSocket) => {
+    console.log('HTTPS GET: ', req.url, new Date().toLocaleTimeString());
+    const srvUrl = url.parse(`http://${req.url}`);
+    const srvSocket = net.connect(srvUrl.port, srvUrl.hostname, () => {
+        cltSocket.write('HTTP/' + req.httpVersion + ' 200 OK\r\n' +
+            '\r\n', 'UTF-8', () =>{
+            srvSocket.pipe(cltSocket);
+            cltSocket.pipe(srvSocket);
+        });
+
+    }).on('error', (err) => {
+        console.log('ERROR SOCKET: ', err);
+    });
 });
 
-server.listen(8000);
+
+proxy.listen(8000, (err) => {
+    if (err) {
+        console.log('ERROR LISTEN: ', err);
+    }
+});
 
