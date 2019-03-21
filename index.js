@@ -7,8 +7,12 @@ const url = require('url');
 const proxy = http.createServer((request, response) => {
 
     response.writeHead(200, { 'Content-Type': 'text/html' });
-
-    if (url.parse(request.url).protocol === 'http:') {
+    if (request.url === '/')
+    {
+        console.log('REQUEST TO SERVER\'S PAGE', new Date().toLocaleTimeString());
+        response.end('This is server\'s page');
+    }
+    else if (url.parse(request.url).protocol === 'http:') {
         console.log('HTTP GET:', request.url, new Date().toLocaleTimeString());
         http.get(request.url, (resp) => {
             resp.pipe(response);
@@ -35,7 +39,10 @@ proxy.on('connect', (req, cltSocket) => {
 });
 
 
-proxy.listen(8000, (err) => {
+const listener = proxy.listen(8000, (err) => {
+    const SERVER_IP = listener.address().address;
+    const SERVER_PORT = listener.address().port;
+    console.log(`Listening on IP: ${SERVER_IP} with PORT: ${SERVER_PORT}`);
     if (err) {
         console.log('ERROR LISTEN: ', err);
     }
