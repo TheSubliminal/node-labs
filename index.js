@@ -4,7 +4,7 @@ const http = require('http');
 const net = require('net');
 const url = require('url');
 
-const proxy = http.createServer((request, response) => {
+const proxy = (request, response) => {
 
     response.writeHead(200, { 'Content-Type': 'text/html' });
     if (request.url === '/')
@@ -21,7 +21,7 @@ const proxy = http.createServer((request, response) => {
         });
     }
 
-}).on('error', (err) => console.log('ERROR SERVER:', err));
+};
 
 proxy.on('connect', (req, cltSocket) => {
     console.log('HTTPS GET: ', req.url, new Date().toLocaleTimeString());
