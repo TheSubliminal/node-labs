@@ -48,3 +48,4 @@ const listener = proxy.listen(8000, (err) => {
     }
 });
 
+module.exports = proxy;
