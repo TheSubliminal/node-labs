@@ -1,51 +1,55 @@
 'use strict';
 
 const http = require('http');
-const net = require('net');
-const url = require('url');
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 
-const proxy = (request, response) => {
+const url = 'http://rozklad.kpi.ua/Schedules/ViewSchedule.aspx?g=894be0b0-9c4b-492e-a3d0-a6950cb1a3e1';
 
-    response.writeHead(200, { 'Content-Type': 'text/html' });
-    if (request.url === '/')
-    {
-        console.log('REQUEST TO SERVER\'S PAGE', new Date().toLocaleTimeString());
-        response.end('This is server\'s page');
+const parse = function parse(htmlData) {
+    const lessons = [];
+    const pairsPerTime = [];
+    const document = new JSDOM(htmlData).window.document;
+    const first_week = document.getElementById('ctl00_MainContent_FirstScheduleTable').getElementsByTagName('tr');
+    for (let index in first_week) {
+        if (index > 0 && index < 5) {
+            pairsPerTime.push(first_week[index].getElementsByTagName('td'));
+        }
     }
-    else if (url.parse(request.url).protocol === 'http:') {
-        console.log('HTTP GET:', request.url, new Date().toLocaleTimeString());
-        http.get(request.url, (resp) => {
-            resp.pipe(response);
-        }).on('error', err => {
-            console.log('ERROR GET: ', err.message);
-        });
+    //console.log(pairsPerTime[0][1].getElementsByTagName('a')[0].innerHTML);
+    for (let day of pairsPerTime) {
+        let nthLessonOfWeek = [];
+        for (let pair in day) {
+            if (pair > 0 && pair < 6) {
+                let lesson = {};
+                let tags = day[pair].getElementsByTagName('a');
+                if (!tags[0]) {
+                    lesson = {};
+                }
+                else {
+                    lesson.name = tags[0].innerHTML;
+                    lesson.teacher = tags[1].innerHTML;
+                    lesson.place = tags[2].innerHTML;
+                }
+                nthLessonOfWeek.push(lesson);
+            }
+        }
+        lessons.push(nthLessonOfWeek);
     }
-
+    console.log(lesson);
 };
 
-proxy.on('connect', (req, cltSocket) => {
-    console.log('HTTPS GET: ', req.url, new Date().toLocaleTimeString());
-    const srvUrl = url.parse(`http://${req.url}`);
-    const srvSocket = net.connect(srvUrl.port, srvUrl.hostname, () => {
-        cltSocket.write('HTTP/' + req.httpVersion + ' 200 OK\r\n' +
-            '\r\n', 'UTF-8', () =>{
-            srvSocket.pipe(cltSocket);
-            cltSocket.pipe(srvSocket);
-        });
+http.get(url, (response) => {
 
-    }).on('error', (err) => {
-        console.log('ERROR SOCKET: ', err);
+    let data = '';
+
+    response.on('data', chunk => {
+       data += chunk;
     });
+
+    response.on('end', () => {
+        parse(data);
+    });
+}).on('error', err => {
+    console.log('ERROR GET: ', err.message);
 });
-
-
-const listener = proxy.listen(8000, (err) => {
-    const SERVER_IP = listener.address().address;
-    const SERVER_PORT = listener.address().port;
-    console.log(`Listening on IP: ${SERVER_IP} with PORT: ${SERVER_PORT}`);
-    if (err) {
-        console.log('ERROR LISTEN: ', err);
-    }
-});
-
-module.exports = proxy;
