@@ -17,17 +17,23 @@ const parse = function parse(htmlData) {
     const firstWeek = formDays(firstWeekLessons);
     const secondWeek = formDays(secondWeekLessons);
 
+    let result = '';
+
     for (let [day, schedule] of firstWeek.entries()) {
-        console.log(`\n\nSchedule for ${day}:\n-----------`);
+        result += `\n\nSchedule for ${day}:\n-----------`;
         for (let lesson of schedule) {
             if (lesson.name) {
+                result += `Pair: ${lesson.name}\nTeacher: ${lesson.teacher}\nPlace: ${lesson.place}\n-----------`;
                 console.log(`Pair: ${lesson.name}\nTeacher: ${lesson.teacher}\nPlace: ${lesson.place}\n-----------`);
             }
             else {
-                console.log('No pair\n-----------');
+                result += 'No pair\n-----------';
             }
         }
     }
+
+    return result;
+
 };
 
 const formDays = function formDays(lessonsByTime) {
@@ -95,17 +101,26 @@ const lessonsPerWeek = function lessonsPerWeek(weekTable) {
     return lessons;
 };
 
-http.get(URL, (response) => {
+const getSchedule = function getSchedule() {
+    let result = '';
+    http.get(URL, (response) => {
 
-    let data = '';
+        let data = '';
 
-    response.on('data', chunk => {
-       data += chunk;
+        response.on('data', chunk => {
+            data += chunk;
+        });
+
+        response.on('end', () => {
+            result = parse(data);
+        });
+    }).on('error', err => {
+        console.log('ERROR GET: ', err.message);
     });
 
-    response.on('end', () => {
-        parse(data);
-    });
-}).on('error', err => {
-    console.log('ERROR GET: ', err.message);
-});
+    return result;
+};
+
+console.log(getSchedule());
+
+module.exports = {getSchedule};
