@@ -4,15 +4,13 @@ const http = require('http');
 const net = require('net');
 const url = require('url');
 
-const proxy = (request, response) => {
+const proxy = http.createServer((request, response) => {
 
-    response.writeHead(200, { 'Content-Type': 'text/html' });
-    if (request.url === '/')
-    {
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    if (request.url === '/') {
         console.log('REQUEST TO SERVER\'S PAGE', new Date().toLocaleTimeString());
         response.end('This is server\'s page');
-    }
-    else if (url.parse(request.url).protocol === 'http:') {
+    } else if (url.parse(request.url).protocol === 'http:') {
         console.log('HTTP GET:', request.url, new Date().toLocaleTimeString());
         http.get(request.url, (resp) => {
             resp.pipe(response);
@@ -21,20 +19,30 @@ const proxy = (request, response) => {
         });
     }
 
-};
+});
 
 proxy.on('connect', (req, cltSocket) => {
     console.log('HTTPS GET: ', req.url, new Date().toLocaleTimeString());
     const srvUrl = url.parse(`http://${req.url}`);
     const srvSocket = net.connect(srvUrl.port, srvUrl.hostname, () => {
         cltSocket.write('HTTP/' + req.httpVersion + ' 200 OK\r\n' +
-            '\r\n', 'UTF-8', () =>{
+                        'Connection: close\r\n' + '\r\n', 'UTF-8', () => {
             srvSocket.pipe(cltSocket);
             cltSocket.pipe(srvSocket);
-        });
+        })
 
     }).on('error', (err) => {
         console.log('ERROR SOCKET: ', err);
+    });
+
+    srvSocket.on('error', (err) => {
+        console.log('ERROR URL:', req.url);
+        console.log('ERROR SERVRER SOCKET: ', err);
+    });
+
+    cltSocket.on('error', (err) => {
+        console.log('ERROR URL:', req.url);
+        console.log('ERROR CLIENT SOCKET: ', err);
     });
 });
 
