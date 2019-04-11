@@ -23,11 +23,9 @@ const parse = function parse(htmlData) {
         result += `\n\nSchedule for ${day}:\n-----------`;
         for (let lesson of schedule) {
             if (lesson.name) {
-                result += `Pair: ${lesson.name}\nTeacher: ${lesson.teacher}\nPlace: ${lesson.place}\n-----------`;
-                console.log(`Pair: ${lesson.name}\nTeacher: ${lesson.teacher}\nPlace: ${lesson.place}\n-----------`);
-            }
-            else {
-                result += 'No pair\n-----------';
+                result += `\nPair: ${lesson.name}\nTeacher: ${lesson.teacher}\nPlace: ${lesson.place}\n-----------`;
+            } else {
+                result += '\nNo pair\n-----------';
             }
         }
     }
@@ -101,26 +99,28 @@ const lessonsPerWeek = function lessonsPerWeek(weekTable) {
     return lessons;
 };
 
-const getSchedule = function getSchedule() {
-    let result = '';
-    http.get(URL, (response) => {
+const getSchedule = async function getSchedule() {
 
-        let data = '';
+    return new Promise((resolve) => {
 
-        response.on('data', chunk => {
-            data += chunk;
+        http.get(URL, (response) => {
+
+            let data = '';
+            let result = '';
+
+            response.on('data', chunk => {
+                data += chunk;
+            });
+
+            response.on('end', () => {
+                result = parse(data);
+                resolve(result)
+            });
+        }).on('error', err => {
+            console.log('ERROR GET: ', err.message);
         });
-
-        response.on('end', () => {
-            result = parse(data);
-        });
-    }).on('error', err => {
-        console.log('ERROR GET: ', err.message);
     });
 
-    return result;
 };
-
-console.log(getSchedule());
 
 module.exports = {getSchedule};
