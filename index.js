@@ -10,12 +10,12 @@ const parse = function parse(htmlData) {
 
     const document = new JSDOM(htmlData).window.document;
 
+    // Get table row of table with the first week lessons
     const firstWeekTable = document.getElementById('ctl00_MainContent_FirstScheduleTable').getElementsByTagName('tr');
-    const secondWeekTable = document.getElementById('ctl00_MainContent_SecondScheduleTable').getElementsByTagName('tr');
+    // Get an array of lessons for the entire week
     const firstWeekLessons = lessonsPerWeek(firstWeekTable);
-    const secondWeekLessons = lessonsPerWeek(secondWeekTable);
+    // Create dictionary with entries: { dayName: objectWithLessons }
     const firstWeek = formDays(firstWeekLessons);
-    const secondWeek = formDays(secondWeekLessons);
 
     let result = '';
 
@@ -36,54 +36,69 @@ const parse = function parse(htmlData) {
 
 const formDays = function formDays(lessonsByTime) {
 
-    const WEEK_DAYS = ['Monday', 'Tuesday', 'Wednsday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const weekDays = ['Monday', 'Tuesday', 'Wednsday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+    // Create structure of the Map - [dayName, lessons]
     const initialWeek = [];
-    for (let idx in lessonsByTime[0]) {
-        initialWeek.push([WEEK_DAYS[idx], []]);
-    }
+    Object.keys(lessonsByTime[0]).forEach(idx => {
+        initialWeek.push([weekDays[idx], []]);
+    });
+
+
     const days = new Map(initialWeek);
 
     let scheduleForDay;
+    // For each nth lessons
     for (let lessonNumber of lessonsByTime) {
-        for (let nthDay in lessonNumber)
-        {
-            scheduleForDay = days.get(WEEK_DAYS[nthDay]);
+        // For each individual lesson
+        Object.keys(lessonNumber).forEach(nthDay => {
+            // Append lesson to the corresponding day
+            scheduleForDay = days.get(weekDays[nthDay]);
             scheduleForDay.push(lessonNumber[nthDay]);
-            //days.set(WEEK_DAYS[nthDay], scheduleForDay.push(lessonNumber[nthDay]));
-        }
+        });
     }
 
     return days;
 };
 
 const lessonsPerWeek = function lessonsPerWeek(weekTable) {
-
+    // Array of arrays with objects with info about first lesson through entire week, second, etc
     const lessons = [];
-    const pairsPerTime = [];
+    // Array of arrays each of which contains DOM elements with info about first, second, etc lessons of the week
+    const lessonsPerTime = [];
 
-    for (let index in weekTable) {
-        if (index > 0 && index < 5) {
-            pairsPerTime.push(weekTable[index].getElementsByTagName('td'));
+    const headerIdx = 0, maxPairs = 4;
+
+    // For each row of lesson
+    Object.keys(weekTable).forEach((index) => {
+        // Not including header and empty lessons
+        if (index > headerIdx && index <= maxPairs) {
+            lessonsPerTime.push(weekTable[index].getElementsByTagName('td'));
         }
-    }
-    //console.log(pairsPerTime[0][1].getElementsByTagName('a')[0].innerHTML);
-    for (let day of pairsPerTime) {
+    });
+
+    const indexColumn = 0, saturdayColumn = 6;
+    // For each day of nth lessons for entire week
+    for (let nthLessonForWeek of lessonsPerTime) {
         let nthLessonOfWeek = [];
-        for (let pair in day) {
-            if (pair > 0 && pair < 6) {
+        // Iterate over lessons
+        Object.keys(nthLessonForWeek).forEach(lessonIdx => {
+            if (lessonIdx > indexColumn && lessonIdx < saturdayColumn) {
                 let lesson = {};
-                let tags = day[pair].getElementsByTagName('a');
+                // Get all tags with data
+                let tags = nthLessonForWeek[lessonIdx].getElementsByTagName('a');
                 if (tags.length === 0) {
                     lesson = {};
                 }
                 else {
                     lesson.name = tags[0].innerHTML;
                     let teachers = [], places = [];
+                    // Get all teachers by selecting all <a> tags with the following URL pattern
                     for (let i = 1; i < tags.length; i++) {
                         if (tags[i].getAttribute('href').includes('/Schedules/ViewSchedule')) {
                             teachers.push(tags[i].innerHTML);
                         }
+                        // Get all places by selecting all <a> tags with the following URL pattern
                         else if (tags[i].getAttribute('href').includes('maps.google.com')) {
                             places.push(tags[i].innerHTML);
                         }
@@ -93,7 +108,7 @@ const lessonsPerWeek = function lessonsPerWeek(weekTable) {
                 }
                 nthLessonOfWeek.push(lesson);
             }
-        }
+        });
         lessons.push(nthLessonOfWeek);
     }
     return lessons;
