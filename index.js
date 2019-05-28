@@ -1,13 +1,43 @@
 'use strict';
 
 const http = require('http');
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
+const { JSDOM } = require("jsdom");
+const request = require('request');
 
-const URL = 'http://rozklad.kpi.ua/Schedules/ViewSchedule.aspx?g=894be0b0-9c4b-492e-a3d0-a6950cb1a3e1';
+const URL = 'http://rozklad.kpi.ua/Schedules/ScheduleGroupSelection.aspx';
+
+const requestGroupUrl = function requestGroupUrl(groupName) {
+    return JSDOM.fromURL(URL).then(dom => {
+        const document = dom.window.document;
+        const formElement = document.getElementById('aspnetForm');
+        const hiddenInputs = formElement.querySelectorAll('input[type="hidden"]');
+        const form = {
+            ctl00$MainContent$ctl00$txtboxGroup: groupName,
+            ctl00$MainContent$ctl00$btnShowSchedule: 'Розклад занять'
+        };
+
+        [...hiddenInputs].forEach(elem => {
+            form[elem.name] = elem.value;
+        });
+
+        return new Promise(resolve => {
+            request.post({
+                url: URL,
+                form
+            }, (err, res) => {
+                resolve(`http://rozklad.kpi.ua${res.headers.location}`);
+            });
+        });
+    });
+};
+
+const getSchedule = function getSchedule(groupName) {
+    return requestGroupUrl(groupName).then(groupUrl => {
+        return getScheduleText(groupUrl);
+    });
+};
 
 const parse = function parse(htmlData) {
-
     const document = new JSDOM(htmlData).window.document;
 
     // Get table row of table with the first week lessons
@@ -17,45 +47,66 @@ const parse = function parse(htmlData) {
     // Create dictionary with entries: { dayName: objectWithLessons }
     const firstWeek = formDays(firstWeekLessons);
 
+    //Filter out empty days
+    [...firstWeek.entries()].forEach(entry => {
+        let dayName = entry[0];
+        let schedule = entry[1];
+        if (!schedule.length) {
+            firstWeek.delete(dayName);
+        }
+    });
+
     let result = '';
 
     for (let [day, schedule] of firstWeek.entries()) {
-        result += `\n\nSchedule for ${day}:\n-----------`;
+        result += `\n\nSchedule for ${day}:\n`;
         for (let lesson of schedule) {
-            if (lesson.name) {
-                result += `\nPair: ${lesson.name}\nTeacher: ${lesson.teacher}\nPlace: ${lesson.place}\n-----------`;
-            } else {
-                result += '\nNo pair\n-----------';
+            let name = lesson.name;
+            if (name) {
+                result += `${lesson.number}) ${name}\n`;
+
+                let teacher = lesson.teacher;
+                if (teacher) {
+                    result += `Teacher: ${teacher}\n`
+                }
+
+                let place = lesson.place;
+                if (place) {
+                    result += `Place: ${place}\n`;
+                }
             }
         }
     }
 
     return result;
-
 };
 
-const formDays = function formDays(lessonsByTime) {
+const formDays = function formDays(weekLessonsByTime) {
 
-    const weekDays = ['Monday', 'Tuesday', 'Wednsday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const weekDays = ['Monday', 'Tuesday', 'Wednsday', 'Thursday', 'Friday', 'Saturday'];
 
     // Create structure of the Map - [dayName, lessons]
     const initialWeek = [];
-    Object.keys(lessonsByTime[0]).forEach(idx => {
+    Object.keys(weekLessonsByTime[0]).forEach(idx => {
         initialWeek.push([weekDays[idx], []]);
     });
-
 
     const days = new Map(initialWeek);
 
     let scheduleForDay;
     // For each nth lessons
-    for (let lessonNumber of lessonsByTime) {
+    let lessonNumber = 1;
+    for (let lessonsPerNumber of weekLessonsByTime) {
         // For each individual lesson
-        Object.keys(lessonNumber).forEach(nthDay => {
+        Object.keys(lessonsPerNumber).forEach(i => {
             // Append lesson to the corresponding day
-            scheduleForDay = days.get(weekDays[nthDay]);
-            scheduleForDay.push(lessonNumber[nthDay]);
+            if (Object.keys(lessonsPerNumber[i]).length) {
+                lessonsPerNumber[i].number = lessonNumber;
+                scheduleForDay = days.get(weekDays[i]);
+                scheduleForDay.push(lessonsPerNumber[i]);
+            }
         });
+        lessonNumber++;
     }
 
     return days;
@@ -67,30 +118,28 @@ const lessonsPerWeek = function lessonsPerWeek(weekTable) {
     // Array of arrays each of which contains DOM elements with info about first, second, etc lessons of the week
     const lessonsPerTime = [];
 
-    const headerIdx = 0, maxPairs = 4;
+    const headerIdx = 0;
 
     // For each row of lesson
     Object.keys(weekTable).forEach((index) => {
         // Not including header and empty lessons
-        if (index > headerIdx && index <= maxPairs) {
+        if (index > headerIdx) {
             lessonsPerTime.push(weekTable[index].getElementsByTagName('td'));
         }
     });
 
-    const indexColumn = 0, saturdayColumn = 6;
+    const indexColumn = 0;
     // For each day of nth lessons for entire week
     for (let nthLessonForWeek of lessonsPerTime) {
         let nthLessonOfWeek = [];
         // Iterate over lessons
         Object.keys(nthLessonForWeek).forEach(lessonIdx => {
-            if (lessonIdx > indexColumn && lessonIdx < saturdayColumn) {
+            if (lessonIdx > indexColumn) {
                 let lesson = {};
                 // Get all tags with data
                 let tags = nthLessonForWeek[lessonIdx].getElementsByTagName('a');
-                if (tags.length === 0) {
-                    lesson = {};
-                }
-                else {
+
+                if (tags.length !== 0) {
                     lesson.name = tags[0].innerHTML;
                     let teachers = [], places = [];
                     // Get all teachers by selecting all <a> tags with the following URL pattern
@@ -114,12 +163,9 @@ const lessonsPerWeek = function lessonsPerWeek(weekTable) {
     return lessons;
 };
 
-const getSchedule = async function getSchedule() {
-
+const getScheduleText = function getScheduleText(url) {
     return new Promise((resolve) => {
-
-        http.get(URL, (response) => {
-
+        http.get(url, (response) => {
             let data = '';
             let result = '';
 
@@ -129,7 +175,7 @@ const getSchedule = async function getSchedule() {
 
             response.on('end', () => {
                 result = parse(data);
-                resolve(result)
+                resolve(result);
             });
         }).on('error', err => {
             console.log('ERROR GET: ', err.message);
