@@ -1,4 +1,4 @@
 {
-	"name": "node_labs",
-	"builds": [{ "src": "index.js", "use": "@now/node" }]
+	"name": "KPI-schedule-bot",
+	"builds": [{ "src": "bot.js", "use": "@now/node" }]
 }

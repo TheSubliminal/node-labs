@@ -4,7 +4,7 @@
   "description": "NodeJS lab wokrs.",
   "main": "start.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node bot.js",
     "lint": "eslint .",
     "deploy": "echo Current branch: $TRAVIS_BRANCH",
     "build": "",

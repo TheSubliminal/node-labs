@@ -34,6 +34,10 @@ const requestGroupUrl = function requestGroupUrl(groupName) {
 const getSchedule = function getSchedule(groupName) {
     return requestGroupUrl(groupName).then(groupUrl => {
         return getScheduleText(groupUrl);
+    }).catch(error => {
+        if (error instanceof ReferenceError) {
+            throw error;
+        }
     });
 };
 
@@ -164,7 +168,7 @@ const lessonsPerWeek = function lessonsPerWeek(weekTable) {
 };
 
 const getScheduleText = function getScheduleText(url) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         http.get(url, (response) => {
             let data = '';
             let result = '';
@@ -178,7 +182,10 @@ const getScheduleText = function getScheduleText(url) {
                 resolve(result);
             });
         }).on('error', err => {
-            console.log('ERROR GET: ', err.message);
+            console.log(err);
+            if (err.code === 'ENOTFOUND') {
+                reject(new ReferenceError('Group not found!'));
+            }
         });
     });
 
