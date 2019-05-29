@@ -1,4 +1,8 @@
 {
+    "version": 2,
 	"name": "KPI-schedule-bot",
-	"builds": [{ "src": "bot.js", "use": "@now/node" }]
+	"builds": [{ "src": "bot.js", "use": "@now/node" }],
+    "env": {
+      "BOT_TOKEN": "@BOT_TOKEN"
+    }
 }
