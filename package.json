@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "deploy": "echo Current branch: $TRAVIS_BRANCH",
     "build": "npm install && node bot.js",
-    "now-build": "node bot.js",
+    "now-build": "npm install && node bot.js",
     "test": "echo \"Error: no test specified\""
   },
   "repository": {
@@ -26,7 +26,6 @@
     "localtunnel": "^1.9.1"
   },
   "dependencies": {
-    "canvas": "^2.5.0",
     "dotenv": "^8.0.0",
     "jsdom": "^15.1.1",
     "now": "^15.3.0",
