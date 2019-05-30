@@ -27,7 +27,8 @@ bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
 });
 
 bot.telegram.setWebhook('node-labs-execution-parser.now.sh');
-const server = http.createServer(bot.webhookCallback('/'));
-server.listen(() => {
-    console.log('App listening');
-});
+module.exports = bot.webhookCallback('/');
+/*server.listen(3000, () => {
+    console.log('App listening on port 3000');
+
+});*/
