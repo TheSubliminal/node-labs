@@ -29,7 +29,7 @@ bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
 const server = http.createServer(bot.webhookCallback('/'));
 server.listen(3000, () => {
     console.log('App listening on port 3000');
-    bot.telegram.setWebhook('kpi-schedule-bot-git-parser.the-subliminal.now.sh');
+    bot.telegram.setWebhook('node-labs-execution-parser.now.sh');
 });
 
 // bot.launch();
