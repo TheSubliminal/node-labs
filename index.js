@@ -35,9 +35,7 @@ const getSchedule = function getSchedule(groupName) {
     return requestGroupUrl(groupName).then(groupUrl => {
         return getScheduleText(groupUrl);
     }).catch(error => {
-        if (error instanceof ReferenceError) {
-            throw error;
-        }
+        throw error;
     });
 };
 
@@ -178,11 +176,14 @@ const getScheduleText = function getScheduleText(url) {
             });
 
             response.on('end', () => {
-                result = parse(data);
+                try {
+                    result = parse(data);
+                } catch (error) {
+                    reject(error);
+                }
                 resolve(result);
             });
         }).on('error', err => {
-            console.log(err);
             if (err.code === 'ENOTFOUND') {
                 reject(new ReferenceError('Group not found!'));
             }

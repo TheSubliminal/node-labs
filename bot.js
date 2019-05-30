@@ -1,17 +1,22 @@
 'use strict';
 
-require('dotenv').config();
+// require('dotenv').config();
 
+const http = require('http');
+// const localtunnel = require('localtunnel');
 const Telegraf = require('telegraf');
+
 const {getSchedule} = require('./index.js');
 
-const bot = new Telegraf(process.env.BOT_TOKEN/*, { telegram: { webhookReply: true }}*/);
+const bot = new Telegraf(process.env.BOT_TOKEN, { webhookReply: false });
 
 bot.start(ctx => ctx.reply('Welcome!'));
 
 bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
-    getSchedule(ctx.message.text)
-        .then(result => ctx.reply(result))
+    return getSchedule(ctx.message.text)
+        .then(result => {
+            ctx.reply(result);
+        })
         .catch(error => {
             if (error instanceof ReferenceError) {
                 ctx.reply(error.message);
@@ -19,10 +24,12 @@ bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
                 ctx.reply('An error occured');
             }
         });
-    //getSchedule(ctx.message.text).then(result => ctx.webhookReply(result)).catch(() => ctx.reply('An error occured'));
 });
 
-bot.launch();
+const server = http.createServer(bot.webhookCallback('/'));
+server.listen(3000, () => {
+    console.log('App listening on port 3000');
+    bot.telegram.setWebhook('kpi-schedule-bot-git-parser.the-subliminal.now.sh');
+});
 
-/*bot.telegram.setWebhook('https://postb.in/1559156301170-6775505274999');
-bot.startWebhook('/1559156301170-6775505274999', null, 443);*/
+// bot.launch();

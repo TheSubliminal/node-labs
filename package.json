@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/TheSubliminal/node_labs#readme",
   "devDependencies": {
-    "eslint": "^5.14.1"
+    "eslint": "^5.14.1",
+    "localtunnel": "^1.9.1"
   },
   "dependencies": {
     "dotenv": "^8.0.0",
