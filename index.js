@@ -16,7 +16,6 @@ bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
     return getSchedule(ctx.message.text)
         .then(result => {
             ctx.reply(result);
-            console.log(process.env);
         })
         .catch(error => {
             if (error instanceof ReferenceError) {

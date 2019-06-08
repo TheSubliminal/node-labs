@@ -8,8 +8,7 @@ const URL = 'http://rozklad.kpi.ua/Schedules/ScheduleGroupSelection.aspx';
 const requestGroupUrl = function requestGroupUrl(groupName) {
     return JSDOM.fromURL(URL).then(dom => {
         const document = dom.window.document;
-        const formElement = document.getElementById('aspnetForm');
-        const hiddenInputs = formElement.querySelectorAll('input[type="hidden"]');
+        const hiddenInputs = document.getElementById('aspnetForm').querySelectorAll('input[type="hidden"]');
         const form = {
             ctl00$MainContent$ctl00$txtboxGroup: groupName,
             ctl00$MainContent$ctl00$btnShowSchedule: 'Розклад занять'
@@ -37,44 +36,31 @@ const parse = function parse(url) {
         // Get table row of table with the first week lessons
         const firstWeekTable = document.getElementById('ctl00_MainContent_FirstScheduleTable').getElementsByTagName('tr');
         // Get an array of lessons for the entire week
-        const firstWeekLessons = lessonsPerWeek(firstWeekTable);
-        // Create dictionary with entries: { dayName: objectWithLessons }
-        const firstWeek = formDays(firstWeekLessons);
+        // Create Map with entries: { dayName: objectWithLessons }
+        const firstWeek = formDays(lessonsPerWeek(firstWeekTable));
 
-        //Filter out empty days
-        [...firstWeek.entries()].forEach(entry => {
-            console.log(entry[0], entry[1]);
-            let dayName = entry[0];
-            let schedule = entry[1];
-            if (!schedule.length) {
-                firstWeek.delete(dayName);
-            }
-        });
-
-        let result = '';
-
-        for (let [day, schedule] of firstWeek.entries()) {
-            result += `\n\nSchedule for ${day}:\n`;
-            for (let lesson of schedule) {
-                let name = lesson.name;
-                if (name) {
-                    result += `${lesson.number}) ${name}\n`;
-
-                    let teacher = lesson.teacher;
-                    if (teacher) {
-                        result += `Teacher: ${teacher}\n`
-                    }
-
-                    let place = lesson.place;
-                    if (place) {
-                        result += `Place: ${place}\n`;
-                    }
-                }
-            }
-        }
-
-        return result;
+        return [...firstWeek.entries()]
+            .filter(([, schedule]) => schedule.length) // Filter out empty days from Map
+            .reduce((acc, [day, schedule]) => {
+                acc += `\n\nSchedule for ${day}:\n`;
+                acc += formatLessonsPerDay(schedule);
+                return acc;
+            }, '');
     });
 };
+
+const formatLessonsPerDay = function formatLessonsPerDay(schedule) {
+    return schedule.filter(({name}) => !!name).reduce((result, {name, number, teacher, place}) => {
+        result += `${number}) ${name}\n`;
+        if (teacher) {
+            result += `Teacher: ${teacher}\n`
+        }
+
+        if (place) {
+            result += `Place: ${place}\n`;
+        }
+        return result;
+    }, '');
+}
 
 module.exports = {requestGroupUrl, parse};
