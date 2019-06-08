@@ -2,11 +2,6 @@
   "version": 2,
   "name": "KPI-schedule-bot",
   "builds": [{ "src": "bot.js", "use": "@now/node", "config": { "maxLambdaSize": "45mb" }}],
-  "build": {
-    "env": {
-      "BOT_TOKEN": "@BOT"
-    }
-  },
   "routes": [{
     "headers": {
       "Access-Control-Allow-Origin": "*",

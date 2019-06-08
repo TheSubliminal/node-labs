@@ -8,7 +8,6 @@ const Telegraf = require('telegraf');
 
 const {getSchedule} = require('./index.js');
 
-console.log(process.env.BOT_TOKEN);
 const bot = new Telegraf(process.env.BOT_TOKEN, { webhookReply: false });
 
 bot.start(ctx => ctx.reply('Welcome!'));
@@ -28,7 +27,7 @@ bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
 });
 
 // bot.telegram.setWebhook('node-labs-execution-parser.now.sh');
-bot.telegram.setWebhook('kpi-schedule-bot-git-parser.the-subliminal.now.sh');
+bot.telegram.setWebhook('kpi-schedule-bot.the-subliminal.now.sh');
 module.exports = bot.webhookCallback('/');
 /*server.listen(3000, () => {
     console.log('App listening on port 3000');
