@@ -26,7 +26,6 @@ bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
         });
 });
 
-// bot.telegram.setWebhook('node-labs-execution-parser.now.sh');
 bot.telegram.setWebhook('https://kpi-schedule-bot.the-subliminal.now.sh');
 module.exports = bot.webhookCallback('/');
 /*server.listen(3000, () => {
