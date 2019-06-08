@@ -8,6 +8,7 @@ const Telegraf = require('telegraf');
 
 const {getSchedule} = require('./index.js');
 
+console.log(process.env.BOT_TOKEN);
 const bot = new Telegraf(process.env.BOT_TOKEN, { webhookReply: false });
 
 bot.start(ctx => ctx.reply('Welcome!'));
