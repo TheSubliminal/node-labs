@@ -4,10 +4,10 @@
   "description": "NodeJS lab wokrs.",
   "main": "start.js",
   "scripts": {
-    "start": "node bot.js",
+    "start": "node index.js",
     "lint": "eslint .",
     "deploy": "echo Current branch: $TRAVIS_BRANCH",
-    "build": "node bot.js",
+    "build": "node index.js",
     "test": "echo \"Error: no test specified\""
   },
   "repository": {

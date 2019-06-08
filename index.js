@@ -1,49 +1,36 @@
 'use strict';
 
-const {requestGroupUrl, parse} = require('./parsing.js');
+// require('dotenv').config();
 
-const getSchedule = function getSchedule(groupName) {
-    return requestGroupUrl(groupName).then(groupUrl => {
-        return getScheduleText(groupUrl);
-    }).catch(error => {
-        throw error;
-    });
-};
+// const http = require('http');
+// const localtunnel = require('localtunnel');
+const Telegraf = require('telegraf');
 
-const getScheduleText = function getScheduleText(url) {
-    return new Promise((resolve, reject) => {
-        parse(url)
-            .then(result => resolve(result))
-            .catch(error => {
-                if (error.code === 'ENOTFOUND') {
-                    reject(new ReferenceError('Group not found!'));
-                }
-            });
-        /*http.get(url, (response) => {
-            let data = '';
-            let result = '';
+const {getSchedule} = require('./schedule.js');
 
-            response.on('data', chunk => {
-                data += chunk;
-            });
+const bot = new Telegraf(process.env.BOT_TOKEN, { webhookReply: false });
 
-            response.on('end', () => {
-                try {
-                    result = parse(data);
-                } catch (error) {
-                    reject(error);
-                }
-                resolve(result);
-            });
-        }).on('error', err => {
-            if (err.code === 'ENOTFOUND') {
-                reject(new ReferenceError('Group not found!'));
+bot.start(ctx => ctx.reply('Welcome!'));
+
+bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
+    return getSchedule(ctx.message.text)
+        .then(result => {
+            ctx.reply(result);
+            console.log(process.env);
+        })
+        .catch(error => {
+            if (error instanceof ReferenceError) {
+                ctx.reply(error.message);
+            } else {
+                ctx.reply('An error occured');
             }
-        });*/
-    });
+        });
+});
 
-};
 
-getSchedule('іс-72').then(result => console.log(result));
+bot.telegram.setWebhook('https://kpi-schedule-bot.the-subliminal.now.sh');
+module.exports = bot.webhookCallback('/');
+/*server.listen(3000, () => {
+    console.log('App listening on port 3000');
 
-module.exports = {getSchedule};
+});*/
