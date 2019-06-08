@@ -23,6 +23,4 @@ const getScheduleText = function getScheduleText(url) {
 
 };
 
-getSchedule('іс-72').then(result => console.log(result));
-
 module.exports = {getSchedule};
