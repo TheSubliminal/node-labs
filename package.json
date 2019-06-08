@@ -8,7 +8,6 @@
     "lint": "eslint .",
     "deploy": "echo Current branch: $TRAVIS_BRANCH",
     "build": "npm install && node bot.js",
-    "now-build": "npm install && node bot.js",
     "test": "echo \"Error: no test specified\""
   },
   "repository": {
@@ -23,12 +22,12 @@
   "homepage": "https://github.com/TheSubliminal/node_labs#readme",
   "devDependencies": {
     "eslint": "^5.14.1",
-    "localtunnel": "^1.9.1"
+    "localtunnel": "^1.9.1",
+    "now": "^15.3.0"
   },
   "dependencies": {
     "dotenv": "^8.0.0",
     "jsdom": "^15.1.1",
-    "now": "^15.3.0",
     "telegraf": "^3.29.0"
   }
 }
