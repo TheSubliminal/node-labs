@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "deploy": "echo Current branch: $TRAVIS_BRANCH",
     "build": "npm install && node bot.js",
+    "now-build": "node bot.js",
     "test": "echo \"Error: no test specified\""
   },
   "repository": {
