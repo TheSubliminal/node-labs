@@ -49,9 +49,10 @@ const lessonsPerWeek = function lessonsPerWeek(weekTable) {
 const parseAnchorTags = function parseAnchorTags(tags) {
     let lesson = {};
 
+    // First tag - with lesson name
     lesson.name = tags[0].textContent;
     let teachers = [], places = [];
-    // Get all teachers by selecting all <a> tags with the following URL pattern
+    // Get all teachers and places by selecting all <a> tags with the following URL pattern
     [...tags].forEach(tag => {
         if (tag.getAttribute('href').includes('/Schedules/ViewSchedule')) {
             teachers.push(tag.textContent);
