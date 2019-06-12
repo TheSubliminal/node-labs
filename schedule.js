@@ -20,7 +20,6 @@ const getScheduleText = function getScheduleText(url) {
                 }
             });
     });
-
 };
 
 module.exports = {getSchedule};

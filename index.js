@@ -1,9 +1,5 @@
 'use strict';
 
-// require('dotenv').config();
-
-// const http = require('http');
-// const localtunnel = require('localtunnel');
 const Telegraf = require('telegraf');
 
 const {getSchedule} = require('./schedule.js');
@@ -29,7 +25,3 @@ bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
 
 bot.telegram.setWebhook('https://kpi-schedule-bot.the-subliminal.now.sh');
 module.exports = bot.webhookCallback('/');
-/*server.listen(3000, () => {
-    console.log('App listening on port 3000');
-
-});*/

@@ -61,6 +61,6 @@ const formatLessonsPerDay = function formatLessonsPerDay(schedule) {
         }
         return result;
     }, '');
-}
+};
 
 module.exports = {requestGroupUrl, parse};
