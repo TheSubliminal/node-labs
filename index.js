@@ -8,7 +8,7 @@ const bot = new Telegraf(process.env.BOT_TOKEN, { webhookReply: false });
 bot.start(ctx => ctx.reply('Welcome!'));
 
 bot.hears(/^[A-Za-z]+$/, ctx => {
-    getMessage(ctx.message.text.toLowerCase(), 1)
+    return getMessage(ctx.message.text.toLowerCase(), 1)
         .then(([messageText, keyboard]) => {
             ctx.reply(messageText, keyboard);
         })
@@ -22,7 +22,7 @@ bot.hears(/^[A-Za-z]+$/, ctx => {
 });
 
 bot.action(/\w+_\d+/, ctx => {
-    getMessage(...ctx.update.callback_query.data.split('_'))
+    return getMessage(...ctx.update.callback_query.data.split('_'))
         .then(([messageText, keyboard]) => {
             ctx.editMessageText(messageText, keyboard);
         });
