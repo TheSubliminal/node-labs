@@ -1,6 +1,6 @@
 'use strict';
 
-const {requestGroupUrl, parse} = require('./parsing.js');
+const {requestGroupUrl, parse} = require('./parsing(1).js');
 
 const getSchedule = function getSchedule(groupName) {
     return requestGroupUrl(groupName)

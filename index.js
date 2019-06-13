@@ -2,16 +2,16 @@
 
 const Telegraf = require('telegraf');
 
-const {getSchedule} = require('./schedule.js');
+const {getScholarships} = require('./scholarships.js');
 
 const bot = new Telegraf(process.env.BOT_TOKEN, { webhookReply: false });
 
 bot.start(ctx => ctx.reply('Welcome!'));
 
-bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
-    return getSchedule(ctx.message.text)
+bot.hears(/^[A-Za-z]+$/, ctx => {
+    return getScholarships(ctx.message.text)
         .then(result => {
-            ctx.reply(result);
+            ctx.reply(result.toLowerCase());
         })
         .catch(error => {
             if (error instanceof ReferenceError) {
@@ -23,5 +23,5 @@ bot.hears(/^[А-ЯІа-яі]{2}-\d\d$/, ctx => {
 });
 
 
-bot.telegram.setWebhook('https://kpi-schedule-bot.the-subliminal.now.sh');
+bot.telegram.setWebhook('https://scholarship-bot.the-subliminal.now.sh');
 module.exports = bot.webhookCallback('/');
