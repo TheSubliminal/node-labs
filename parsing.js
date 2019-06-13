@@ -18,7 +18,7 @@ const requestScholarshipsHtml = function requestScholarshipsHtml(countryName, pa
 const getScholarshipsListDivs = function getScholarshipsListDivs (scholarshipList) {
     return [...scholarshipList.getElementsByTagName('div')]
         .slice(1, -1) // Slice off first div with metadata and last div with pagination
-        .filter(div => div.previousElementSibling.tagName !== 'P' && div.previousElementSibling.tagName !== 'A');
+        .filter(div => div.previousElementSibling.tagName !== 'P' && div.previousElementSibling.tagName !== 'A'); // Filter out divs with ads
 };
 
 module.exports = {requestScholarshipsHtml, getScholarshipsListDivs};
