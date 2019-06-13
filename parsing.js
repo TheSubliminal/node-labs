@@ -3,9 +3,15 @@ const { JSDOM } = require('jsdom');
 const BASE_URL = 'https://www.scholarshipportal.com/scholarships/';
 
 const requestScholarshipsHtml = function requestScholarshipsHtml(countryName, pageNumber = 1) {
-    return JSDOM.fromURL(`${BASE_URL}${countryName}?page=${pageNumber}`).then(dom => {
-        const document = dom.window.document;
-        return document.body.querySelector('.container .row .col-sm-8.col-md-9').firstElementChild;
+    return JSDOM.fromURL(`${BASE_URL}${countryName}?page=${pageNumber}`)
+        .then(dom => {
+            const document = dom.window.document;
+            return document.body.querySelector('.container .row .col-sm-8.col-md-9').firstElementChild;
+        })
+        .catch(error => {
+            if (error.statusCode === 404) {
+                throw new ReferenceError('Invalid country name');
+            }
         });
 };
 

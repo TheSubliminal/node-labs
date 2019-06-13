@@ -1,27 +1,32 @@
 'use strict';
 
 const Telegraf = require('telegraf');
-
-const {getScholarships} = require('./scholarships.js');
+const {getMessage} = require('./scholarships.js');
 
 const bot = new Telegraf(process.env.BOT_TOKEN, { webhookReply: false });
 
 bot.start(ctx => ctx.reply('Welcome!'));
 
 bot.hears(/^[A-Za-z]+$/, ctx => {
-    return getScholarships(ctx.message.text)
-        .then(result => {
-            ctx.reply(result.toLowerCase());
+    getMessage(ctx.message.text.toLowerCase(), 1)
+        .then(([messageText, keyboard]) => {
+            ctx.reply(messageText, keyboard);
         })
         .catch(error => {
             if (error instanceof ReferenceError) {
                 ctx.reply(error.message);
             } else {
-                ctx.reply('An error occured');
+                ctx.reply('Error occured');
             }
         });
 });
 
+bot.action(/\w+_\d+/, ctx => {
+    getMessage(...ctx.update.callback_query.data.split('_'))
+        .then(([messageText, keyboard]) => {
+            ctx.editMessageText(messageText, keyboard);
+        });
+});
 
 bot.telegram.setWebhook('https://scholarship-bot.the-subliminal.now.sh');
 module.exports = bot.webhookCallback('/');

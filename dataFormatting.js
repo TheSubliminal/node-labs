@@ -4,6 +4,7 @@ const formatScholarships = function formatScholarships(scholarshipList) {
         const [money, deadline] = [...scholarshipDiv.querySelectorAll('ul.list.list--labels.scholarship__labels li')]
             .map(li => li.classList.contains('expired') ? `${li.textContent} (Expired!)` : li.textContent);
         const scholarshipLink = scholarshipDiv.firstElementChild.href;
+
         return `${scholarshipTitle}\n${money}\n${deadline}\n${scholarshipLink}\n\n`;
     }).join('');
 };
