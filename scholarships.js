@@ -24,6 +24,4 @@ const getPagination = function getPagination(countryName, paginationDiv) {
     return Markup.inlineKeyboard(keys).extra();
 };
 
-// getMessage('denmark', 1).then(result => console.log(result));
-
 module.exports = {getMessage};
